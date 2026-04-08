@@ -9,9 +9,15 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@portabletext/react": "^6.0.3",
+    "@sanity/client": "^7.17.0",
+    "@vercel/analytics": "^2.0.1",
+    "framer-motion": "^12.36.0",
     "next": "16.1.6",
+    "next-sanity": "^12.1.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "resend": "^6.9.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -3,31 +3,33 @@
 import { useRef } from 'react'
 import { useInView } from 'framer-motion'
 
+// Combined and updated to include all your actual skills while fitting the 4-col design
 const skillGroups = [
   {
+    title: 'Languages',
+    skills: ['JavaScript / TypeScript', 'Python', 'C / C++', 'SQL'],
+  },
+  {
     title: 'Frontend',
-    skills: ['React.js', 'Redux Toolkit', 'TypeScript', 'Tailwind CSS', 'HTML5 / CSS3'],
+    skills: ['React.js', 'Redux Toolkit', 'Tailwind CSS', 'HTML5 / CSS3'],
   },
   {
     title: 'Backend',
-    skills: ['Node.js', 'Express.js', 'FastAPI', '.NET MVC', 'REST APIs'],
+    skills: ['Node.js & Express', 'FastAPI', '.NET MVC', 'REST & WebSockets', 'JWT Auth'],
   },
   {
-    title: 'Database',
-    skills: ['MongoDB', 'YugabyteDB', 'MySQL', 'Mongoose ODM'],
-  },
-  {
-    title: 'AI / ML',
-    skills: ['Gemini API', 'HuggingFace', 'LLM Integration', 'Z-score Analysis'],
+    title: 'Data & AI',
+    skills: ['Machine Learning', 'MongoDB & Mongoose', 'MySQL & YugabyteDB', 'Gemini API', 'HuggingFace'],
   },
 ]
 
 export default function SkillsGrid() {
-  const ref = useRef<HTMLDivElement>(null)
+  // Attached the ref to the section itself so the header animation triggers at the right time
+  const ref = useRef<HTMLElement>(null)
   const isInView = useInView(ref, { once: true, margin: '-60px' })
 
   return (
-    <section className="px-10 py-16 border-b border-rule" id="skills">
+    <section ref={ref} className="px-10 py-16 border-b border-rule" id="skills">
 
       {/* Header */}
       <div
@@ -47,7 +49,6 @@ export default function SkillsGrid() {
 
       {/* Grid */}
       <div
-        ref={ref}
         className="grid grid-cols-2 md:grid-cols-4"
         style={{
           border: '1px solid #e5e5e5',
@@ -59,7 +60,12 @@ export default function SkillsGrid() {
         {skillGroups.map((group, i) => (
           <div
             key={group.title}
-            className={`p-6 ${i < skillGroups.length - 1 ? 'border-r border-rule' : ''}`}
+            // Fix: Conditional borders that handle BOTH 2-column mobile and 4-column desktop
+            className={`p-6 border-rule 
+              ${i % 2 === 0 ? 'border-r' : ''} 
+              ${i < 2 ? 'border-b md:border-b-0' : ''} 
+              md:border-r ${i === 3 ? 'md:border-r-0' : ''}`
+            }
           >
             {/* Column title */}
             <h3 className="font-mono text-[10px] tracking-[0.1em] uppercase font-medium pb-3 mb-4 border-b border-rule">

@@ -2,14 +2,22 @@
 
 import { useState } from 'react'
 
-const contactInfo = [
-  { label: 'Email',    value: 'sagarrajgantayat9178@gmail.com',              href: 'mailto:sagarrajgantayat9178@gmail.com' },
-  { label: 'LinkedIn', value: 'linkedin.com/in/sagar-raj-gantayat',          href: 'https://linkedin.com/in/sagar-raj-gantayat-a8b6ab203' },
-  { label: 'GitHub',   value: 'github.com/sagarrajgantayat',                 href: 'https://github.com' },
-  { label: 'Location', value: 'Hyderabad, India — Open to remote',           href: null },
+// 1. Added strict typing for your contact data
+interface ContactLink {
+  label: string
+  value: string
+  href: string | null
+}
+
+const contactInfo: ContactLink[] = [
+  { label: 'Email',    value: 'sagarrajgantayat9178@gmail.com',        href: 'mailto:sagarrajgantayat9178@gmail.com' },
+  { label: 'LinkedIn', value: 'linkedin.com/in/sagar-raj-gantayat',    href: 'https://linkedin.com/in/sagar-raj-gantayat-a8b6ab203' },
+  { label: 'GitHub',   value: 'github.com/sagarrajgantayat',           href: 'https://github.com/sagarrajgantayat' },
+  { label: 'Location', value: 'Hyderabad, India — Open to remote',     href: null },
 ]
 
-type FormState = 'idle' | 'loading' | 'success' | 'error'
+// 2. Simplified state: no network requests mean no 'loading' or 'error' states needed
+type FormState = 'idle' | 'success'
 
 export default function ContactPage() {
   const [formState, setFormState] = useState<FormState>('idle')
@@ -26,26 +34,22 @@ export default function ContactPage() {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  // 3. Removed async because window.location.href is synchronous
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setFormState('loading')
 
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
+    const { name, email, subject, message } = formData
+    const emailBody = `Name: ${name}\nReturn Email: ${email}\n\nMessage:\n${message}`
+    
+    const mailtoLink = `mailto:sagarrajgantayat9178@gmail.com?subject=${encodeURIComponent(
+      subject || 'Portfolio Contact'
+    )}&body=${encodeURIComponent(emailBody)}`
+    
+    window.location.href = mailtoLink
 
-      if (res.ok) {
-        setFormState('success')
-        setFormData({ name: '', email: '', subject: '', message: '' })
-      } else {
-        setFormState('error')
-      }
-    } catch {
-      setFormState('error')
-    }
+    // Instantly show success state and clear form
+    setFormState('success')
+    setFormData({ name: '', email: '', subject: '', message: '' })
   }
 
   return (
@@ -94,7 +98,7 @@ export default function ContactPage() {
                   {item.label}
                 </p>
                 {item.href ? (
-                <a
+                  <a
                     href={item.href}
                     target={item.href.startsWith('http') ? '_blank' : undefined}
                     rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
@@ -118,16 +122,16 @@ export default function ContactPage() {
             // Success state
             <div className="border border-rule p-10 flex flex-col items-start gap-4">
               <p className="font-mono text-[10px] tracking-[0.1em] uppercase text-muted">
-                Message sent
+                Message formatted
               </p>
               <h2 className="font-display text-[32px] font-light leading-tight">
-                Thanks, I&apos;ll be in touch soon.
+                Your default mail app should be open now.
               </h2>
               <button
                 onClick={() => setFormState('idle')}
                 className="mt-4 font-mono text-[10px] tracking-[0.08em] uppercase text-muted hover:text-ink transition-colors duration-200"
               >
-                Send another →
+                Draft another message →
               </button>
             </div>
           ) : (
@@ -137,10 +141,12 @@ export default function ContactPage() {
               {/* Name + Email row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-2">
-                  <label className="font-mono text-[9px] tracking-[0.1em] uppercase text-muted">
+                  {/* 4. Added htmlFor and id to all inputs for accessibility */}
+                  <label htmlFor="name" className="font-mono text-[9px] tracking-[0.1em] uppercase text-muted cursor-pointer">
                     Name
                   </label>
                   <input
+                    id="name"
                     type="text"
                     name="name"
                     required
@@ -151,10 +157,11 @@ export default function ContactPage() {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="font-mono text-[9px] tracking-[0.1em] uppercase text-muted">
+                  <label htmlFor="email" className="font-mono text-[9px] tracking-[0.1em] uppercase text-muted cursor-pointer">
                     Email
                   </label>
                   <input
+                    id="email"
                     type="email"
                     name="email"
                     required
@@ -168,10 +175,11 @@ export default function ContactPage() {
 
               {/* Subject */}
               <div className="flex flex-col gap-2">
-                <label className="font-mono text-[9px] tracking-[0.1em] uppercase text-muted">
+                <label htmlFor="subject" className="font-mono text-[9px] tracking-[0.1em] uppercase text-muted cursor-pointer">
                   Subject
                 </label>
                 <input
+                  id="subject"
                   type="text"
                   name="subject"
                   required
@@ -184,10 +192,11 @@ export default function ContactPage() {
 
               {/* Message */}
               <div className="flex flex-col gap-2">
-                <label className="font-mono text-[9px] tracking-[0.1em] uppercase text-muted">
+                <label htmlFor="message" className="font-mono text-[9px] tracking-[0.1em] uppercase text-muted cursor-pointer">
                   Message
                 </label>
                 <textarea
+                  id="message"
                   name="message"
                   required
                   rows={6}
@@ -198,20 +207,12 @@ export default function ContactPage() {
                 />
               </div>
 
-              {/* Error message */}
-              {formState === 'error' && (
-                <p className="font-mono text-[10px] text-red-500 tracking-[0.06em]">
-                  Something went wrong. Try emailing directly instead.
-                </p>
-              )}
-
               {/* Submit */}
               <button
                 type="submit"
-                disabled={formState === 'loading'}
-                className="self-start inline-flex items-center gap-2 px-6 py-3 bg-ink text-paper text-[11.5px] tracking-[0.05em] font-sans hover:bg-transparent hover:text-ink border border-ink transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="self-start inline-flex items-center gap-2 px-6 py-3 bg-ink text-paper text-[11.5px] tracking-[0.05em] font-sans hover:bg-transparent hover:text-ink border border-ink transition-all duration-200"
               >
-                {formState === 'loading' ? 'Sending...' : 'Send Message →'}
+                Launch Mail App →
               </button>
 
             </form>

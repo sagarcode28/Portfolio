@@ -60,8 +60,8 @@ function ProjectCard({
 
     return (
         <div
-            //ref={ref}
-            //href={`/work/${project.slug.current}`}
+            ref={ref}
+            href={`/work/${project.slug.current}`}
             className="group bg-paper flex flex-col gap-4 p-7 min-h-[280px] border-rule transition-colors duration-[220ms] hover:bg-ink hover:text-paper cursor-pointer"
             style={{
                 opacity: isInView ? 1 : 0,

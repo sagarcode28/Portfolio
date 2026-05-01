@@ -59,7 +59,7 @@ function ProjectCard({
     const isInView = useInView(ref, { once: true, margin: '-60px' })
 
     return (
-        <div
+        <Link
             ref={ref}
             href={`/work/${project.slug.current}`}
             className="group bg-paper flex flex-col gap-4 p-7 min-h-[280px] border-rule transition-colors duration-[220ms] hover:bg-ink hover:text-paper cursor-pointer"
@@ -94,7 +94,7 @@ function ProjectCard({
             <span className="self-end text-[16px] transition-transform duration-[220ms] group-hover:translate-x-1 group-hover:-translate-y-1">
                 ↗
             </span>
-        </div>
+        </Link>
     )
 }
 
